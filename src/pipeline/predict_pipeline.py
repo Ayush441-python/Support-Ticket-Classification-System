@@ -1,12 +1,11 @@
 import sys
 import os
-import pandas as pd
-import numpy as np
 from dataclasses import dataclass
 
 from src.logger import logging
 from src.exception import CustomException
 from src.utils import clean_text, load_object
+
 
 @dataclass
 class PredictionPipelineConfig:
@@ -18,49 +17,43 @@ class PredictionPipelineConfig:
 
 
 class PredictionPipeline:
+
     def __init__(self):
         self.config = PredictionPipelineConfig()
 
     def predict(self, text_input):
 
         try:
-            logging.info("Starting prediction pipeline")
+            logging.info("Prediction pipeline started")
 
             # =========================
-            # Load saved objects
+            # Load artifacts
             # =========================
 
             type_model = load_object(self.config.ticket_type_model_path)
             priority_model = load_object(self.config.ticket_priority_model_path)
-
             tfidf = load_object(self.config.tfidf_path)
             type_encoder = load_object(self.config.type_encoder_path)
             priority_encoder = load_object(self.config.priority_encoder_path)
 
-            logging.info("All artifacts loaded successfully")
+            logging.info("Artifacts loaded successfully")
 
             # =========================
-            # Preprocess input text
+            # Preprocess input
             # =========================
 
             cleaned_text = clean_text(text_input)
 
-            transformed_text = tfidf.transform([cleaned_text]).toarray()
+            transformed_text = tfidf.transform([cleaned_text])
+            # Keep sparse format (better for text models)
 
             # =========================
-            # Make Predictions
+            # Predict
             # =========================
 
             type_pred = type_model.predict(transformed_text)
             priority_pred = priority_model.predict(transformed_text)
 
-            type_pred = type_pred.astype(int)
-            priority_pred = priority_pred.astype(int)
-
-            final_type = type_encoder.inverse_transform(type_pred)[0]
-            final_priority = priority_encoder.inverse_transform(priority_pred)[0]
-
-            # Convert back to original labels
             final_type = type_encoder.inverse_transform(type_pred)[0]
             final_priority = priority_encoder.inverse_transform(priority_pred)[0]
 

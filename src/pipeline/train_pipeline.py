@@ -1,6 +1,5 @@
 import sys
 import os
-
 import numpy as np
 from dataclasses import dataclass
 
@@ -25,65 +24,64 @@ class ModelTrainer:
     def __init__(self):
         self.model_trainer_config = ModelTrainerConfig()
 
-
     def initiate_model_trainer(self, train_arr, test_arr):
 
         try:
-            logging.info("Starting model training pipeline")
+            logging.info("Model training pipeline started")
 
             # =========================
-            # Split input and targets
+            # Split Features and Targets
             # =========================
 
             X_train = train_arr[:, :-2]
-            y_train_type = train_arr[:, -2]
-            y_train_priority = train_arr[:, -1]
+            y_train_type = train_arr[:, -2].astype(int)
+            y_train_priority = train_arr[:, -1].astype(int)
 
             X_test = test_arr[:, :-2]
-            y_test_type = test_arr[:, -2]
-            y_test_priority = test_arr[:, -1]
+            y_test_type = test_arr[:, -2].astype(int)
+            y_test_priority = test_arr[:, -1].astype(int)
 
-            logging.info("Data splitting completed")
-
+            logging.info("Feature-target splitting completed")
 
             # =========================
-            # Define models
+            # Define Models
             # =========================
 
             models = {
-                "Logistic Regression": LogisticRegression(max_iter=1000,class_weight='balanced'),
-                "Random Forest": RandomForestClassifier(class_weight='balanced'),
+                "Logistic Regression": LogisticRegression(
+                    max_iter=1000,
+                    class_weight="balanced",
+                    random_state=42
+                ),
+                "Random Forest": RandomForestClassifier(
+                    class_weight="balanced",
+                    random_state=42
+                ),
                 "Linear SVC": LinearSVC(),
                 "KNN": KNeighborsClassifier()
             }
 
             param_grids = {
-
                 "Logistic Regression": {
                     "C": [0.01, 0.1, 1, 10]
                 },
-
                 "Random Forest": {
                     "n_estimators": [100, 200],
                     "max_depth": [None, 10, 20]
                 },
-
                 "Linear SVC": {
                     "C": [0.01, 0.1, 1, 10]
                 },
-
                 "KNN": {
                     "n_neighbors": [3, 5, 7]
                 }
-
             }
-
 
             # =========================
             # Train Ticket Type Model
             # =========================
 
-            logging.info("Training Ticket Type model with hyperparameter tuning")
+            logging.info("Training model for Ticket Type")
 
             report_type, best_type_name, best_type_model = evaluate_models(
                 X_train,
@@ -96,12 +94,11 @@ class ModelTrainer:
 
             logging.info(f"Best Ticket Type Model: {best_type_name}")
 
-
             # =========================
             # Train Ticket Priority Model
             # =========================
 
-            logging.info("Training Ticket Priority model with hyperparameter tuning")
+            logging.info("Training model for Ticket Priority")
 
             report_priority, best_priority_name, best_priority_model = evaluate_models(
                 X_train,
@@ -113,6 +110,10 @@ class ModelTrainer:
             )
 
             logging.info(f"Best Ticket Priority Model: {best_priority_name}")
+
+            # =========================
+            # Save Best Models
+            # =========================
 
             save_object(
                 file_path=self.model_trainer_config.ticket_type_model_path,
@@ -126,16 +127,12 @@ class ModelTrainer:
 
             logging.info("Best models saved successfully")
 
-            print("\nBest Ticket Type Model:", best_type_name)
-            print("Best Ticket Priority Model:", best_priority_name)
-
             return (
                 report_type,
                 report_priority,
                 best_type_name,
                 best_priority_name
             )
-
 
         except Exception as e:
             raise CustomException(e, sys)
