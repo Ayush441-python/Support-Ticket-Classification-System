@@ -1,6 +1,70 @@
+# ------------------------------
+# Python
+# ------------------------------
 __pycache__/
-*.pyc
-*.pkl
-artifacts/
-.env
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.pyo
+
+# Virtual Environment
+env/
 venv/
+ENV/
+.venv/
+
+# ------------------------------
+# Jupyter Notebook
+# ------------------------------
+.ipynb_checkpoints
+
+# ------------------------------
+# IDE / Editor Files
+# ------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ------------------------------
+# Logs & Runtime Files
+# ------------------------------
+*.log
+logs/
+
+# ------------------------------
+# Environment Variables
+# ------------------------------
+.env
+.env.*
+
+# ------------------------------
+# Build / Distribution
+# ------------------------------
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ------------------------------
+# ML Model Artifacts
+# ------------------------------
+artifacts/
+models/
+*.pkl
+*.joblib
+*.h5
+
+# ------------------------------
+# Dataset Files
+# ------------------------------
+data/
+*.csv
+*.xlsx
+
+# ------------------------------
+# OS Files
+# ------------------------------
+.DS_Store
+Thumbs.db
